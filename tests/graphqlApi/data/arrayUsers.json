@@ -1,0 +1,36 @@
+[
+    {
+        "name": "Marc Anthony",
+        "username": "Salsa Singer",
+        "email": "marc@example.com",
+        "phone": "11233211",
+        "website": "www.web1.com"
+    },
+
+    {
+        "name": "Prince Royce",
+        "username": "Bachata Man",
+        "email": "royce@email.com",
+        "phone": "000001111",
+        "website": "www.web2.com"
+    },
+
+    {
+        "name": "Don Omar",
+        "username": "Reggaerton Artist",
+        "email": "don@omar.com",
+        "phone": "3221001111",
+        "website": "www.web3.com"
+        
+    },
+
+    {
+        "name": "David Bisbal",
+        "username": "Song Writer",
+        "email": "davidbis@bal.com",
+        "phone": "14222111",
+        "website": "www.web4.com"
+        
+    }
+
+]
