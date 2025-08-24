@@ -23,7 +23,7 @@ export class albumsClass {
           id
           title
           user {
-            id
+            name
           }
         }
       }
@@ -50,7 +50,9 @@ export class albumsClass {
       }) {
         id
         title
-        userId
+        user {
+          name
+        }
       }
     }
   `;
@@ -72,7 +74,9 @@ export class albumsClass {
           data {
             id
             title
-            userId
+            user {
+              name
+            }
           }
         }
       }
@@ -112,7 +116,9 @@ export class albumsClass {
           data {
             id
             title
-            userId
+            user {
+              name
+            }
           }
           meta {
             totalCount
