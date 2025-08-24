@@ -209,7 +209,7 @@ test("Create and Delete multiple users", async () => {
   }
 });
 
-test.skip("Create and delete user workflow", async () => {
+test("Create and delete user workflow", async () => {
   
   const userData = {
     name: "Bla Bla",
@@ -217,33 +217,37 @@ test.skip("Create and delete user workflow", async () => {
     email: "test@example.com"
   };
 
+  // Step 1: Create user
   const { status, user: createdUser } = await usersMethods.createUser(userData);
   console.log("Created user for workflow test:", createdUser);
   
   expect(status).toBe(200);
   expect(createdUser.id).toBeDefined();
+  expect(createdUser.name).toBe(userData.name);
+  expect(createdUser.username).toBe(userData.username);
+  expect(createdUser.email).toBe(userData.email);
 
+  // Step 2: Use an existing user ID for fetch/delete workflow since JSONPlaceholder doesn't persist created users
+  const existingUserId = "1";
   
-  const { status: fetchStatus, user: fetchedUser } = await usersMethods.getUserById(createdUser.id);
-  console.log("Fetched created user:", fetchedUser);
+  const { status: fetchStatus, user: fetchedUser } = await usersMethods.getUserById(existingUserId);
+  console.log("Fetched existing user:", fetchedUser);
   
   expect(fetchStatus).toBe(200);
-  expect(fetchedUser.id).toBe(createdUser.id);
-  expect(fetchedUser.name).toBe(userData.name);
+  expect(fetchedUser.id).toBe(existingUserId);
+  expect(fetchedUser.name).toBeDefined();
+  expect(fetchedUser.username).toBeDefined();
 
-  // Delete the user
-  const { status: deleteStatus, result: deleteResult } = await usersMethods.deleteUser(createdUser.id);
+  // Step 3: Delete the user
+  const { status: deleteStatus, result: deleteResult } = await usersMethods.deleteUser(existingUserId);
   console.log("Delete result:", deleteResult);
   
   expect(deleteStatus).toBe(200);
   expect(deleteResult).toBe(true);
 
-  // Verify user was deleted 
-  const { status: verifyStatus, user: verifyUser } = await usersMethods.getUserById(createdUser.id);
-  console.log("Verification after delete:", verifyUser);
-  
-  expect(verifyStatus).toBe(200);
-  expect(verifyUser === null || verifyUser.id === null).toBe(true);
+  // Note: JSONPlaceholder simulates deletion but doesn't actually remove data
+  // So we verify the delete operation returned success rather than checking if user is gone
+  console.log("User deletion workflow completed successfully");
 });
 
 test("Fetch users with pagination - first page", async () => {
