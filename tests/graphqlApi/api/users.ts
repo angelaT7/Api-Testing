@@ -76,5 +76,99 @@ export class usersClass {
     user: body.data.createUser
   };
 }
-}
 
+  // Fetch all users
+  async getAllUsers(): Promise<{ status: number; users: any[] }> {
+    const query = `
+      query {
+        users {
+          data {
+            id
+            name
+            username
+            email
+            phone
+            website
+          }
+        }
+      }
+    `;
+
+    const response = await this.apiCallsForUsers.post("/api", { data: { query } });
+    const body = await response.json();
+
+    return {
+      status: response.status(),
+      users: body.data.users.data || []
+    };
+  }
+
+  // Delete user by ID
+  async deleteUser(id: string | number): Promise<{ status: number; result: boolean }> {
+    const mutation = `
+      mutation {
+        deleteUser(id: "${typeof id === "string" ? id : id.toString()}")
+      }
+    `;
+
+    const response = await this.apiCallsForUsers.post("/api", { data: { query: mutation } });
+    const body = await response.json();
+
+    return {
+      status: response.status(),
+      result: body.data.deleteUser
+    };
+  }
+
+  // Fetch users with pagination
+  async getUsersWithPagination(page: number = 1, limit: number = 10): Promise<{ status: number; users: any[]; pagination: any }> {
+    const query = `
+      query {
+        users(options: { paginate: { page: ${page}, limit: ${limit} } }) {
+          data {
+            id
+            name
+            username
+            email
+            phone
+            website
+          }
+          meta {
+            totalCount
+          }
+        }
+      }
+    `;
+
+    const response = await this.apiCallsForUsers.post("/api", { data: { query } });
+    const body = await response.json();
+
+    // Handle potential GraphQL errors
+    if (body.errors) {
+      console.error("GraphQL errors:", body.errors);
+    }
+
+    const users = body.data?.users?.data || [];
+    const meta = body.data?.users?.meta || {};
+    
+    // Calculate pagination info based on the response
+    const totalCount = meta.totalCount || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+    const currentPage = Math.max(1, page); // Ensure page is at least 1
+    
+    const pagination = {
+      currentPage,
+      limit,
+      totalCount,
+      totalPages,
+      hasNextPage: currentPage < totalPages,
+      hasPreviousPage: currentPage > 1
+    };
+
+    return {
+      status: response.status(),
+      users,
+      pagination
+    };
+  }  
+}
