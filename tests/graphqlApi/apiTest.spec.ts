@@ -150,11 +150,11 @@ test("Fetch user by invalid ID format", async () => {
 });
 
 test("Delete user by valid ID", async () => {
-  // First create a user to delete
+  
   const userData = {
     name: "User to Delete",
-    username: "usertodelete",
-    email: "delete@example.com"
+    username: "deletedUser",
+    email: "delete@user.com"
   };
 
   const { user: createdUser } = await usersMethods.createUser(userData);
@@ -187,10 +187,10 @@ test("Delete user by invalid ID format", async () => {
 });
 
 test("Create and Delete multiple users", async () => {
-  // Create multiple users
+  
   const usersToDelete = [
-    { name: "User 1", username: "user1", email: "user1@example.com" },
-    { name: "User 2", username: "user2", email: "user2@example.com" }
+    { name: "User 1", username: "user1", email: "user1@test.com" },
+    { name: "User 2", username: "user2", email: "user2@test.com" }
   ];
 
   const createdUserIds: string[] = [];
@@ -199,7 +199,7 @@ test("Create and Delete multiple users", async () => {
     createdUserIds.push(user.id);
   }
 
-  // Delete all created users
+  // Deleteig users
   for (const userId of createdUserIds) {
     const { status, result } = await usersMethods.deleteUser(userId);
     
@@ -210,7 +210,7 @@ test("Create and Delete multiple users", async () => {
 });
 
 test("Create and delete user workflow", async () => {
-  // Create user
+  
   const userData = {
     name: "Bla Bla",
     username: "Test",
@@ -223,7 +223,7 @@ test("Create and delete user workflow", async () => {
   expect(status).toBe(200);
   expect(createdUser.id).toBeDefined();
 
-  // Verify user was created by fetching it
+  
   const { status: fetchStatus, user: fetchedUser } = await usersMethods.getUserById(createdUser.id);
   console.log("Fetched created user:", fetchedUser);
   
@@ -238,12 +238,11 @@ test("Create and delete user workflow", async () => {
   expect(deleteStatus).toBe(200);
   expect(deleteResult).toBe(true);
 
-  // Verify user was deleted by trying to fetch it again
+  // Verify user was deleted 
   const { status: verifyStatus, user: verifyUser } = await usersMethods.getUserById(createdUser.id);
   console.log("Verification after delete:", verifyUser);
   
   expect(verifyStatus).toBe(200);
-  // User should no longer exist (could be null or have null id)
   expect(verifyUser === null || verifyUser.id === null).toBe(true);
 });
 
