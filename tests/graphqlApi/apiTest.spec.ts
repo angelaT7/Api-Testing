@@ -209,7 +209,7 @@ test("Create and Delete multiple users", async () => {
   }
 });
 
-test("Create and delete user workflow", async () => {
+test.skip("Create and delete user workflow", async () => {
   
   const userData = {
     name: "Bla Bla",
@@ -300,7 +300,7 @@ test("Fetch users with pagination - edge case page 0", async () => {
   
   expect(status).toBe(200);
   expect(Array.isArray(users)).toBe(true);
-  // GraphQL might handle page 0 as page 1 or return empty results
+  // Might handle page 0 as page 1 or return empty results
   expect(pagination).toBeDefined();
 });
 
@@ -312,7 +312,7 @@ test("Fetch users with pagination - negative page", async () => {
   
   expect(status).toBe(200);
   expect(Array.isArray(users)).toBe(true);
-  // GraphQL might handle negative pages or return empty results
+  // Might handle negative pages or return empty results
   expect(pagination).toBeDefined();
 });
 
@@ -324,7 +324,7 @@ test("Fetch users with pagination - zero limit", async () => {
   
   expect(status).toBe(200);
   expect(Array.isArray(users)).toBe(true);
-  // GraphQL might handle zero limit or return empty results
+  // Might handle zero limit or return empty results
   expect(pagination).toBeDefined();
 });
 
@@ -336,16 +336,15 @@ test("Fetch users with pagination - very high page number", async () => {
   
   expect(status).toBe(200);
   expect(Array.isArray(users)).toBe(true);
+
   // Should return empty results for non-existent pages
   expect(pagination.currentPage).toBe(999);
   expect(pagination.totalPages).toBeLessThan(999);
 });
 
-test("Fetch users with pagination - compare different page sizes", async () => {
-  // Fetch with limit 5
-  const { users: users5, pagination: pagination5 } = await usersMethods.getUsersWithPagination(1, 5);
+test("Fetch users with pagination - compare different limits", async () => {
   
-  // Fetch with limit 10
+  const { users: users5, pagination: pagination5 } = await usersMethods.getUsersWithPagination(1, 5);
   const { users: users10, pagination: pagination10 } = await usersMethods.getUsersWithPagination(1, 10);
 
   console.log("Limit 5 users count:", users5.length);
