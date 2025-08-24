@@ -18,7 +18,7 @@ export class usersClass {
     this.fetchUsers = userData;
   }
 
-  // Fetch user by ID and return both status and user
+  
   async getUserById(id: string | number): Promise<{ status: number; user: any }> {
     const query = `
       query {
