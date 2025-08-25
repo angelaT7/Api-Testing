@@ -10,7 +10,6 @@ test.beforeAll(async () => {
   const apiRequest = await request.newContext({ baseURL });
   usersMethods = new usersClass(apiRequest);
   
-  
   expect(baseURL).toBe("https://graphqlzero.almansi.me");
 });
 

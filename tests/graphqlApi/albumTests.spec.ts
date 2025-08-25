@@ -3,14 +3,30 @@ import { albumsClass } from './api/albums';
 
 let albumsMethods: albumsClass;
 let baseURL: string;
+let createdAlbumIds: string[] = [];
 
 test.beforeAll(async () => {
   baseURL = "https://graphqlzero.almansi.me";
   const apiRequest = await request.newContext({ baseURL });
   albumsMethods = new albumsClass(apiRequest);
   
-  
   expect(baseURL).toBe("https://graphqlzero.almansi.me");
+});
+
+test.afterAll(async () => {
+  console.log(`Cleaning up ${createdAlbumIds.length} created albums...`);
+  
+  for (const albumId of createdAlbumIds) {
+    try {
+      const { status, result } = await albumsMethods.deleteAlbum(albumId);
+      console.log(`Deleted album ${albumId}: ${result ? 'Success' : 'Failed'} (Status: ${status})`);
+    } catch (error) {
+      console.log(`Failed to delete album ${albumId}:`, error);
+    }
+  }
+  
+  createdAlbumIds = []; // Clear the array
+  console.log('Album cleanup completed.');
 });
 
 test("Fetch Album by ID", async () => {
@@ -26,6 +42,9 @@ for (const album of albumsMethods.fetchAlbums) {
   const albumData = { title: album.title, userId: album.userid };
   const { status, album: createdAlbum } = await albumsMethods.createAlbum(albumData);
 
+  if (createdAlbum && createdAlbum.id) {
+    createdAlbumIds.push(createdAlbum.id);
+  }
   
     console.log("Created album:", createdAlbum);
     expect(status).toBe(200);
@@ -40,6 +59,10 @@ test("Create album with valid data", async () => {
   };
 
   const { status, album } = await albumsMethods.createAlbum(albumData);
+
+  if (album && album.id) {
+    createdAlbumIds.push(album.id);
+  }
 
   console.log("Created album:", album);
   expect(status).toBe(200);
@@ -56,6 +79,10 @@ test("Create album with minimal required data", async () => {
 
   const { status, album } = await albumsMethods.createAlbum(albumData);
 
+  if (album && album.id) {
+    createdAlbumIds.push(album.id);
+  }
+
   console.log("Created minimal album:", album);
   expect(status).toBe(200);
   expect(album.id).toBeDefined();
@@ -70,6 +97,10 @@ test("Create album with empty required fields", async () => {
   };
 
   const { status, album } = await albumsMethods.createAlbum(albumData);
+
+  if (album && album.id) {
+    createdAlbumIds.push(album.id);
+  }
 
   console.log("Album creation with empty fields result:", album);
   expect(status).toBe(200);
