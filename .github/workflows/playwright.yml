@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright API Tests
 
 on:
   push:
@@ -8,16 +8,19 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - uses: actions/checkout@v4
 
+      # 2️⃣ Setup Node.js
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 20
 
+      # 3️⃣ Cache npm packages
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
@@ -26,21 +29,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      # 4️⃣ Configure npm retries
       - name: Configure npm retries
         run: |
           npm config set fetch-retries 5
           npm config set fetch-retry-mintimeout 2000
           npm config set fetch-retry-maxtimeout 120000
 
+      # 5️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      # 6️⃣ Run Playwright API tests (no browsers needed)
+      - name: Run Playwright API tests
+        run: npx playwright test --reporter=html
 
-      - name: Run Playwright tests
-        run: npx playwright test
-
+      # 7️⃣ Upload test report
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
