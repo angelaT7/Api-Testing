@@ -3,6 +3,7 @@ import { usersClass } from './api/users';
 
 let usersMethods: usersClass;
 let baseURL: string;
+let createdUserIds: string[] = [];
 
 test.beforeAll(async () => {
   baseURL = "https://graphqlzero.almansi.me";
@@ -11,6 +12,22 @@ test.beforeAll(async () => {
   
   
   expect(baseURL).toBe("https://graphqlzero.almansi.me");
+});
+
+test.afterAll(async () => {
+  console.log(`Cleaning up ${createdUserIds.length} created users...`);
+  
+  for (const userId of createdUserIds) {
+    try {
+      const { status, result } = await usersMethods.deleteUser(userId);
+      console.log(`Deleted user ${userId}: ${result ? 'Success' : 'Failed'} (Status: ${status})`);
+    } catch (error) {
+      console.log(`Failed to delete user ${userId}:`, error);
+    }
+  }
+  
+  createdUserIds = []; // Clear the array
+  console.log('Cleanup completed.');
 });
 
 test("Fetch user by ID", async () => {
@@ -25,6 +42,9 @@ test("Create all users from the array", async () => {
 for (const user of usersMethods.fetchUsers) {
   const { status, user: createdUser } = await usersMethods.createUser(user);
 
+  if (createdUser && createdUser.id) {
+    createdUserIds.push(createdUser.id);
+  }
   
     console.log("Created user:", createdUser);
     expect(status).toBe(200);
@@ -42,6 +62,10 @@ test("Create user with valid data", async () => {
   };
 
   const { status, user } = await usersMethods.createUser(userData);
+
+  if (user && user.id) {
+    createdUserIds.push(user.id);
+  }
 
   console.log("Created user:", user);
   expect(status).toBe(200);
@@ -62,6 +86,10 @@ test("Create user with minimal required data", async () => {
 
   const { status, user } = await usersMethods.createUser(userData);
 
+  if (user && user.id) {
+    createdUserIds.push(user.id);
+  }
+
   console.log("Created minimal user:", user);
   expect(status).toBe(200);
   expect(user.id).toBeDefined();
@@ -79,6 +107,10 @@ test("Create user with invalid email format", async () => {
 
   const { status, user } = await usersMethods.createUser(userData);
 
+  if (user && user.id) {
+    createdUserIds.push(user.id);
+  }
+
   console.log("User creation with invalid email result:", user);
   expect(status).toBe(200);
 
@@ -94,6 +126,10 @@ test("Create user with empty required fields", async () => {
   };
 
   const { status, user } = await usersMethods.createUser(userData);
+
+  if (user && user.id) {
+    createdUserIds.push(user.id);
+  }
 
   console.log("User creation with empty fields result:", user);
   expect(status).toBe(200);
