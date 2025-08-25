@@ -1,6 +1,8 @@
 import { APIRequestContext } from "@playwright/test";
 import * as fs from 'fs'; 
+import * as path from 'path';
 
+const filePath = path.join(__dirname, 'data/arrayUsers.json');
 const userData = JSON.parse(fs.readFileSync('..\\Api-Testing\\tests\\graphqlApi\\data\\arrayUsers.json', 'utf-8')) as Array<{
   name: string;
   username: string;
