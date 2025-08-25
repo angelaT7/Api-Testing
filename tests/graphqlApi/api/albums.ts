@@ -66,7 +66,7 @@ export class albumsClass {
   };
 }
 
-  // Fetch all albums
+  
   async getAllAlbums(): Promise<{ status: number; albums: any[] }> {
     const query = `
       query {
@@ -91,7 +91,7 @@ export class albumsClass {
     };
   }
 
-  // Delete album by ID
+  
   async deleteAlbum(id: string | number): Promise<{ status: number; result: boolean }> {
     const mutation = `
       mutation {
@@ -108,7 +108,7 @@ export class albumsClass {
     };
   }
 
-  // Fetch albums with pagination
+  
   async getAlbumsWithPagination(page: number = 1, limit: number = 10): Promise<{ status: number; albums: any[]; pagination: any }> {
     const query = `
       query {
@@ -130,7 +130,7 @@ export class albumsClass {
     const response = await this.apiCallsForAlbums.post("/api", { data: { query } });
     const body = await response.json();
 
-    // Handle potential GraphQL errors
+    
     if (body.errors) {
       console.error("GraphQL errors:", body.errors);
     }
@@ -138,10 +138,10 @@ export class albumsClass {
     const albums = body.data?.albums?.data || [];
     const meta = body.data?.albums?.meta || {};
     
-    // Calculate pagination info based on the response
+    
     const totalCount = meta.totalCount || 0;
     const totalPages = Math.ceil(totalCount / limit);
-    const currentPage = Math.max(1, page); // Ensure page is at least 1
+    const currentPage = Math.max(1, page); 
     
     const pagination = {
       currentPage,

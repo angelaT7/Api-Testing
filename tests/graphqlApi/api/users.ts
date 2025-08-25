@@ -77,7 +77,7 @@ export class usersClass {
   };
 }
 
-  // Fetch all users
+  
   async getAllUsers(): Promise<{ status: number; users: any[] }> {
     const query = `
       query {
@@ -103,7 +103,7 @@ export class usersClass {
     };
   }
 
-  // Delete user by ID
+  
   async deleteUser(id: string | number): Promise<{ status: number; result: boolean }> {
     const mutation = `
       mutation {
@@ -120,7 +120,7 @@ export class usersClass {
     };
   }
 
-  // Fetch users with pagination
+ 
   async getUsersWithPagination(page: number = 1, limit: number = 10): Promise<{ status: number; users: any[]; pagination: any }> {
     const query = `
       query {
@@ -143,7 +143,7 @@ export class usersClass {
     const response = await this.apiCallsForUsers.post("/api", { data: { query } });
     const body = await response.json();
 
-    // Handle potential GraphQL errors
+    
     if (body.errors) {
       console.error("GraphQL errors:", body.errors);
     }
@@ -151,10 +151,10 @@ export class usersClass {
     const users = body.data?.users?.data || [];
     const meta = body.data?.users?.meta || {};
     
-    // Calculate pagination info based on the response
+    
     const totalCount = meta.totalCount || 0;
     const totalPages = Math.ceil(totalCount / limit);
-    const currentPage = Math.max(1, page); // Ensure page is at least 1
+    const currentPage = Math.max(1, page); 
     
     const pagination = {
       currentPage,

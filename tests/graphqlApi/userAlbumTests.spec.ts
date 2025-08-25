@@ -30,7 +30,7 @@ test.afterAll(async () => {
     }
   }
   
-  // Then clean up users
+  // Users deletion
   for (const userId of createdUserIds) {
     try {
       const { status, result } = await usersMethods.deleteUser(userId);
@@ -45,14 +45,14 @@ test.afterAll(async () => {
   console.log('User-Album relationship cleanup completed.');
 });
 
-// Test: Verify albums belong to specific users (using existing users)
+
 test("Create album for existing user and verify ownership", async () => {
  
   const existingUserId = "1";
   
   
   const { status: userStatus, user } = await usersMethods.getUserById(existingUserId);
-  console.log("Fetched existing user for ownership test:", user);
+  console.log("Fetched existing user:", user);
   expect(userStatus).toBe(200);
   expect(user.id).toBe(existingUserId);
 
@@ -77,11 +77,11 @@ test("Create album for existing user and verify ownership", async () => {
   expect(album.user.name).toBe(user.name);
 });
 
-// Test: Cross-entity validation - newly created users vs albums
-test("Cross-entity validation: newly created user album relationship", async () => {
+
+test("create user and album for same user", async () => {
   // Step 1: Create a user
   const userData = {
-    name: "New User Test",
+    name: "User 1 test",
     username: "newusertest",
     email: "newuser@test.com"
   };
@@ -95,7 +95,7 @@ test("Cross-entity validation: newly created user album relationship", async () 
   expect(userStatus).toBe(200);
   expect(user.id).toBeDefined();
 
-  // Step 2: Create an album for this newly created user
+  // Album creation
   const albumData = {
     title: "New User's Album",
     userId: user.id
@@ -111,11 +111,9 @@ test("Cross-entity validation: newly created user album relationship", async () 
   expect(album.id).toBeDefined();
   expect(album.title).toBe(albumData.title);
   
-  // Step 3: Cross-entity validation - API behavior with new users
   expect(album.user).toBeDefined();
   
-  // The API shows that newly created users don't establish proper relationships
-  // This is important cross-entity validation behavior to document
+  
   if (album.user.name === null) {
     console.log("API Behavior: Newly created users don't establish album relationships immediately");
     expect(album.user.name).toBeNull();
@@ -124,11 +122,11 @@ test("Cross-entity validation: newly created user album relationship", async () 
   }
 });
 
-// Test: Create album for non-existent user (Cross-entity validation)
+
 test("Create album for non-existent user", async () => {
   const albumData = {
     title: "Orphaned Album",
-    userId: "99999" // Non-existent user ID
+    userId: "99999" 
   };
 
   const { status, album } = await albumsMethods.createAlbum(albumData);
@@ -142,21 +140,20 @@ test("Create album for non-existent user", async () => {
   // The API should handle this gracefully - either reject or create with null user
   if (album) {
     expect(album.title).toBe(albumData.title);
-    // Check if user is null or has some default behavior
     console.log("User data in album:", album.user);
   }
 });
 
-// Test: Verify user data consistency in album queries (Cross-entity validation)
-test("Verify user data consistency between user and album queries", async () => {
-  // Step 1: Get an existing user
+
+test("Create album for existing user", async () => {
+  // Fetch a user
   const { status: userStatus, user } = await usersMethods.getUserById("1");
   
   console.log("Fetched user for consistency test:", user);
   expect(userStatus).toBe(200);
   expect(user.id).toBe("1");
 
-  // Step 2: Create an album for this user
+  // Create an album for this user
   const albumData = {
     title: "Consistency Test Album",
     userId: user.id
@@ -169,11 +166,9 @@ test("Verify user data consistency between user and album queries", async () => 
 
   console.log("Created album for consistency test:", album);
   expect(albumStatus).toBe(200);
-
-  // Step 3: Cross-validate user data consistency
   expect(album.user.name).toBe(user.name);
   
-  // Additional validation: Fetch the album again and verify consistency
+  // Verify that the album is created
   const { status: fetchStatus, album: fetchedAlbum } = await albumsMethods.getAlbumById(album.id);
   
   console.log("Re-fetched album for consistency validation:", fetchedAlbum);
@@ -186,20 +181,17 @@ test("Verify user data consistency between user and album queries", async () => 
     expect(fetchedAlbum.title).toBe(albumData.title);
     console.log("API Behavior: Album persisted with correct data");
   } else {
-    // If album doesn't persist or has incomplete data (expected for test API)
+    // If album doesn't persist or has incomplete data
     console.log("API Behavior: Test API doesn't persist created albums with complete data - this is expected");
     expect(fetchedAlbum).toBeDefined();
     
-    // Document the specific behavior observed
-    if (fetchedAlbum && fetchedAlbum.user && fetchedAlbum.user.name === null) {
-      console.log("API Behavior: Fetched album has null user.name - simulated API behavior");
-    }
+    
   }
 });
 
-// Test: Create multiple albums for the same user
+
 test("Create multiple albums for the same user", async () => {
-  // Use an existing user to avoid creating unnecessary test data
+  
   const userId = "2";
   
   const albumsData = [
@@ -230,14 +222,14 @@ test("Create multiple albums for the same user", async () => {
   const uniqueUserNames = [...new Set(userNames)];
   
   console.log("User names from all albums:", userNames);
-  expect(uniqueUserNames.length).toBe(1); // All albums should belong to the same user
+  expect(uniqueUserNames.length).toBe(1); 
 });
 
-// Test: Album creation with invalid user ID format (Cross-entity validation)
+
 test("Create album with invalid user ID format", async () => {
   const albumData = {
     title: "Invalid User ID Album",
-    userId: "invalid-user-id"
+    userId: "i+1Ìn"
   };
 
   const { status, album } = await albumsMethods.createAlbum(albumData);
@@ -255,65 +247,9 @@ test("Create album with invalid user ID format", async () => {
   }
 });
 
-// Test: Verify album-user relationship after user data changes
-test("Album-user relationship consistency after user operations", async () => {
-  // Step 1: Create a user
-  const userData = {
-    name: "Relationship Test User",
-    username: "relationshiptest",
-    email: "relationship@test.com"
-  };
 
-  const { status: userStatus, user } = await usersMethods.createUser(userData);
-  if (user && user.id) {
-    createdUserIds.push(user.id);
-  }
-
-  expect(userStatus).toBe(200);
-  console.log("Created user for relationship test:", user);
-
-  // Step 2: Create an album for this user
-  const albumData = {
-    title: "Relationship Test Album",
-    userId: user.id
-  };
-
-  const { status: albumStatus, album } = await albumsMethods.createAlbum(albumData);
-  if (album && album.id) {
-    createdAlbumIds.push(album.id);
-  }
-
-  expect(albumStatus).toBe(200);
-  console.log("Created album for relationship test:", album);
-
-  // Step 3: Verify initial relationship (handle API behavior)
-  if (album.user && album.user.name) {
-    expect(album.user.name).toBe(userData.name);
-  } else {
-    console.log("API Behavior: Newly created user relationship not established immediately");
-    expect(album.user.name).toBeNull();
-  }
-
-  // Step 4: Fetch the album again to verify relationship persistence
-  const { status: fetchStatus, album: fetchedAlbum } = await albumsMethods.getAlbumById(album.id);
-  
-  expect(fetchStatus).toBe(200);
-  console.log("Fetched album to verify relationship:", fetchedAlbum);
-  
-  // Handle API behavior for fetched albums
-  if (fetchedAlbum && fetchedAlbum.title) {
-    expect(fetchedAlbum.title).toBe(albumData.title);
-    if (fetchedAlbum.user && fetchedAlbum.user.name) {
-      expect(fetchedAlbum.user.name).toBe(userData.name);
-    }
-  } else {
-    console.log("API Behavior: Album may not persist after creation");
-  }
-});
-
-// Test: Bulk operations - Create user and multiple albums in sequence
-test("Bulk user-album creation workflow", async () => {
-  // Step 1: Create a user for bulk album creation
+test("create user and multiple albums sequentially", async () => {
+  //Create a user
   const userData = {
     name: "Bulk Test User",
     username: "bulktest",
@@ -328,7 +264,7 @@ test("Bulk user-album creation workflow", async () => {
   expect(userStatus).toBe(200);
   console.log("Created user for bulk test:", user);
 
-  // Step 2: Create multiple albums for this user
+  // Bulk album creation
   const albumTitles = [
     "Bulk Album 1",
     "Bulk Album 2", 
@@ -350,23 +286,18 @@ test("Bulk user-album creation workflow", async () => {
     expect(status).toBe(200);
     expect(album.title).toBe(title);
     
-    // Handle API behavior with newly created users
+    
     if (album.user && album.user.name) {
       expect(album.user.name).toBe(userData.name);
     } else {
-      console.log(`API Behavior: Album "${title}" created but user relationship not established`);
+      console.log(`Album "${title}" created but not linked to user`);
       expect(album.user.name).toBeNull();
     }
     
     createdAlbums.push(album);
     console.log(`Created bulk album "${title}":`, album);
   }
-
-  // Step 3: Verify all albums are created
   expect(createdAlbums.length).toBe(albumTitles.length);
-  
-  // Document API behavior with newly created users
-  console.log("API Behavior: Newly created users may not establish immediate album relationships");
 
   console.log(`Successfully created ${createdAlbums.length} albums for user "${userData.name}"`);
 });

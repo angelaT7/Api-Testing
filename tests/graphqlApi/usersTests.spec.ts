@@ -25,8 +25,8 @@ test.afterAll(async () => {
     }
   }
   
-  createdUserIds = []; // Clear the array
-  console.log('Cleanup completed.');
+  createdUserIds = []; 
+  console.log('Delete added data.');
 });
 
 test("Fetch user by ID", async () => {
@@ -80,7 +80,7 @@ test("Create user with minimal required data", async () => {
   const userData = {
     name: "r",
     username: "r",
-    email: "minimal@test.com"
+    email: "md@test.com"
   };
 
   const { status, user } = await usersMethods.createUser(userData);
@@ -89,7 +89,7 @@ test("Create user with minimal required data", async () => {
     createdUserIds.push(user.id);
   }
 
-  console.log("Created minimal user:", user);
+  console.log("User with minimal data:", user);
   expect(status).toBe(200);
   expect(user.id).toBeDefined();
   expect(user.name).toBe(userData.name);
@@ -133,7 +133,7 @@ test("Create user with empty required fields", async () => {
   console.log("User creation with empty fields result:", user);
   expect(status).toBe(200);
   
-
+  // Should return error (if there is validation)
   expect(user).toBeDefined();
 });
 
@@ -145,7 +145,7 @@ test("Fetch all users", async () => {
   expect(Array.isArray(users)).toBe(true);
   expect(users.length).toBeGreaterThan(0);
   
-  // Verify user structure
+  
   if (users.length > 0) {
     const firstUser = users[0];
     expect(firstUser).toHaveProperty('id');
@@ -181,6 +181,7 @@ test("Fetch user by invalid ID format", async () => {
   console.log("Fetch user with invalid ID format result:", user);
   expect(status).toBe(200);
   
+  // Should return error (if there is ID format validation)
   expect(user).toBeDefined();
 });
 
@@ -208,7 +209,8 @@ test("Delete user by non-existent ID", async () => {
 
   console.log("Delete non-existent user result:", result);
   expect(status).toBe(200);
-  // GraphQL might return false or handle this differently
+
+  //Might return false or handle this differently
   expect(result).toBeDefined();
 });
 
@@ -252,7 +254,7 @@ test("Create and delete user workflow", async () => {
     email: "test@example.com"
   };
 
-  // Step 1: Create user
+  // Create user
   const { status, user: createdUser } = await usersMethods.createUser(userData);
   console.log("Created user for workflow test:", createdUser);
   
@@ -262,7 +264,7 @@ test("Create and delete user workflow", async () => {
   expect(createdUser.username).toBe(userData.username);
   expect(createdUser.email).toBe(userData.email);
 
-  // Step 2: Use an existing user ID for fetch/delete workflow since JSONPlaceholder doesn't persist created users
+  // Fetch user
   const existingUserId = "1";
   
   const { status: fetchStatus, user: fetchedUser } = await usersMethods.getUserById(existingUserId);
@@ -273,15 +275,14 @@ test("Create and delete user workflow", async () => {
   expect(fetchedUser.name).toBeDefined();
   expect(fetchedUser.username).toBeDefined();
 
-  // Step 3: Delete the user
+  // Delete the user
   const { status: deleteStatus, result: deleteResult } = await usersMethods.deleteUser(existingUserId);
   console.log("Delete result:", deleteResult);
   
   expect(deleteStatus).toBe(200);
   expect(deleteResult).toBe(true);
 
-  // Note: JSONPlaceholder simulates deletion but doesn't actually remove data
-  // So we verify the delete operation returned success rather than checking if user is gone
+  // As no data is removed, we verify only the delete operation reports success
   console.log("User deletion workflow completed successfully");
 });
 
@@ -339,6 +340,7 @@ test("Fetch users with pagination - edge case page 0", async () => {
   
   expect(status).toBe(200);
   expect(Array.isArray(users)).toBe(true);
+  
   // Might handle page 0 as page 1 or return empty results
   expect(pagination).toBeDefined();
 });
