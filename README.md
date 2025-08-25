@@ -20,7 +20,7 @@ Tests cover **Users** and **Albums** endpoints, including queries, mutations, pa
 
 The tests use local JSON files for input data. This approach allows running the same tests with different datasets without changing the test logic.  
 
-Example of loading JSON data in the tests:
+Example of loading JSON data in the tests (Use your file name):
 
 ```ts
 import * as fs from 'fs';
